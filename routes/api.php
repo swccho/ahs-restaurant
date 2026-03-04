@@ -24,5 +24,17 @@ Route::middleware('throttle:api')->prefix('admin')->group(function (): void {
             Route::delete('/{category}', [\App\Http\Controllers\Api\Admin\CategoryController::class, 'destroy']);
             Route::patch('/{category}/toggle', [\App\Http\Controllers\Api\Admin\CategoryController::class, 'toggle']);
         });
+
+        Route::post('/uploads/menu-item-image', [\App\Http\Controllers\Api\Admin\UploadController::class, 'uploadMenuItemImage']);
+
+        Route::prefix('menu-items')->group(function (): void {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'store']);
+            Route::get('/{menuItem}', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'show']);
+            Route::put('/{menuItem}', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'update']);
+            Route::delete('/{menuItem}', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'destroy']);
+            Route::patch('/{menuItem}/availability', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'availability']);
+            Route::patch('/{menuItem}/featured', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'featured']);
+        });
     });
 });

@@ -69,7 +69,7 @@ class DemoRestaurantDataSeeder extends Seeder
             ['name' => 'Vegetable Pasta', 'slug' => 'vegetable-pasta', 'category_index' => 1, 'price' => 11.99, 'description' => 'Seasonal vegetables, olive oil'],
             ['name' => 'Steak Frites', 'slug' => 'steak-frites', 'category_index' => 1, 'price' => 18.99, 'description' => 'Ribeye with french fries', 'is_featured' => true],
             ['name' => 'Chocolate Cake', 'slug' => 'chocolate-cake', 'category_index' => 2, 'price' => 6.99, 'description' => 'Rich chocolate layer cake'],
-            ['name' => 'Ice Cream Sundae', 'slug' => 'ice-cream-sundae', 'category_index' => 2, 'price' => 5.50, 'description' => 'Vanilla ice cream, toppings'],
+            ['name' => 'Ice Cream Sundae', 'slug' => 'ice-cream-sundae', 'category_index' => 2, 'price' => 5.50, 'description' => 'Vanilla ice cream, toppings', 'is_available' => false],
         ];
 
         $menuItems = [];
@@ -87,7 +87,7 @@ class DemoRestaurantDataSeeder extends Seeder
                     'description' => $row['description'] ?? null,
                     'price' => $row['price'],
                     'discount_price' => $row['discount_price'] ?? null,
-                    'is_available' => true,
+                    'is_available' => $row['is_available'] ?? true,
                     'is_featured' => $row['is_featured'] ?? false,
                     'sort_order' => $i + 1,
                 ]
