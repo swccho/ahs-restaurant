@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Auth\Access\AuthorizationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
         $middleware->alias([
             'restaurant.scoped' => \App\Http\Middleware\EnsureUserHasRestaurant::class,
+            'admin.restaurant.scope' => \App\Http\Middleware\EnsureAdminRestaurantScope::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -27,6 +29,11 @@ return Application::configure(basePath: dirname(__DIR__))
                     $e->status,
                     $e->errors()
                 );
+            }
+        });
+        $exceptions->renderable(function (AuthorizationException $e, $request) {
+            if ($request->expectsJson()) {
+                return ApiResponse::error($e->getMessage() ?: 'This action is unauthorized.', 403);
             }
         });
     })->create();

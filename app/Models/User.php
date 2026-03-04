@@ -59,6 +59,16 @@ class User extends Authenticatable
         return $this->belongsTo(Restaurant::class);
     }
 
+    public function isOwner(): bool
+    {
+        return $this->role === 'owner';
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->role === 'staff';
+    }
+
     /**
      * Orders this user last updated (status_updated_by).
      *

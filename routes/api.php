@@ -9,8 +9,10 @@ Route::middleware('throttle:api')->prefix('admin')->group(function (): void {
     });
 
     Route::post('/login', [\App\Http\Controllers\Api\Admin\AuthController::class, 'login']);
-    Route::post('/logout', [\App\Http\Controllers\Api\Admin\AuthController::class, 'logout'])
-        ->middleware('auth:sanctum');
-    Route::get('/me', [\App\Http\Controllers\Api\Admin\AuthController::class, 'me'])
-        ->middleware(['auth:sanctum', 'restaurant.scoped']);
+
+    Route::middleware(['auth:sanctum', 'admin.restaurant.scope'])->group(function (): void {
+        Route::post('/logout', [\App\Http\Controllers\Api\Admin\AuthController::class, 'logout']);
+        Route::get('/me', [\App\Http\Controllers\Api\Admin\AuthController::class, 'me']);
+        Route::get('/_debug/scope', [\App\Http\Controllers\Api\Admin\DebugScopeController::class, 'scope']);
+    });
 });
