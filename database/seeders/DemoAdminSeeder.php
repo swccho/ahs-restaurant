@@ -16,8 +16,13 @@ class DemoAdminSeeder extends Seeder
     {
         $restaurant = Restaurant::firstOrCreate(
             ['id' => 1],
-            ['name' => 'Demo Restaurant']
+            [
+                'name' => 'Demo Restaurant',
+                'slug' => 'demo-restaurant',
+                'is_active' => true,
+            ]
         );
+        $restaurant->update(['slug' => 'demo-restaurant']);
 
         User::updateOrCreate(
             ['email' => self::DEMO_EMAIL],
