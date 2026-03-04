@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use App\Models\Concerns\BelongsToRestaurant;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
-    use BelongsToRestaurant;
+    use BelongsToRestaurant, HasFactory;
 
     protected $fillable = [
         'restaurant_id',
@@ -25,6 +27,7 @@ class Order extends Model
         'total',
         'status_updated_at',
         'status_updated_by',
+        'cancel_reason',
     ];
 
     protected function casts(): array

@@ -13,7 +13,15 @@ Route::middleware('throttle:api')->prefix('admin')->group(function (): void {
     Route::middleware(['auth:sanctum', 'admin.restaurant.scope'])->group(function (): void {
         Route::post('/logout', [\App\Http\Controllers\Api\Admin\AuthController::class, 'logout']);
         Route::get('/me', [\App\Http\Controllers\Api\Admin\AuthController::class, 'me']);
-        Route::get('/_debug/scope', [\App\Http\Controllers\Api\Admin\DebugScopeController::class, 'scope']);
+
+        Route::prefix('staff')->group(function (): void {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\StaffController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\Admin\StaffController::class, 'store']);
+            Route::get('/{user}', [\App\Http\Controllers\Api\Admin\StaffController::class, 'show']);
+            Route::put('/{user}', [\App\Http\Controllers\Api\Admin\StaffController::class, 'update']);
+            Route::patch('/{user}/toggle', [\App\Http\Controllers\Api\Admin\StaffController::class, 'toggle']);
+            Route::delete('/{user}', [\App\Http\Controllers\Api\Admin\StaffController::class, 'destroy']);
+        });
 
         Route::prefix('categories')->group(function (): void {
             Route::get('/', [\App\Http\Controllers\Api\Admin\CategoryController::class, 'index']);
@@ -26,6 +34,12 @@ Route::middleware('throttle:api')->prefix('admin')->group(function (): void {
         });
 
         Route::post('/uploads/menu-item-image', [\App\Http\Controllers\Api\Admin\UploadController::class, 'uploadMenuItemImage']);
+        Route::post('/uploads/offer-banner', [\App\Http\Controllers\Api\Admin\UploadController::class, 'uploadOfferBanner']);
+        Route::post('/uploads/restaurant-logo', [\App\Http\Controllers\Api\Admin\UploadController::class, 'uploadRestaurantLogo']);
+        Route::post('/uploads/restaurant-cover', [\App\Http\Controllers\Api\Admin\UploadController::class, 'uploadRestaurantCover']);
+
+        Route::get('/settings', [\App\Http\Controllers\Api\Admin\RestaurantSettingsController::class, 'show']);
+        Route::put('/settings', [\App\Http\Controllers\Api\Admin\RestaurantSettingsController::class, 'update']);
 
         Route::prefix('menu-items')->group(function (): void {
             Route::get('/', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'index']);
@@ -35,6 +49,21 @@ Route::middleware('throttle:api')->prefix('admin')->group(function (): void {
             Route::delete('/{menuItem}', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'destroy']);
             Route::patch('/{menuItem}/availability', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'availability']);
             Route::patch('/{menuItem}/featured', [\App\Http\Controllers\Api\Admin\MenuItemController::class, 'featured']);
+        });
+
+        Route::prefix('offers')->group(function (): void {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\OfferController::class, 'index']);
+            Route::post('/', [\App\Http\Controllers\Api\Admin\OfferController::class, 'store']);
+            Route::get('/{offer}', [\App\Http\Controllers\Api\Admin\OfferController::class, 'show']);
+            Route::put('/{offer}', [\App\Http\Controllers\Api\Admin\OfferController::class, 'update']);
+            Route::delete('/{offer}', [\App\Http\Controllers\Api\Admin\OfferController::class, 'destroy']);
+            Route::patch('/{offer}/toggle', [\App\Http\Controllers\Api\Admin\OfferController::class, 'toggle']);
+        });
+
+        Route::prefix('orders')->group(function (): void {
+            Route::get('/', [\App\Http\Controllers\Api\Admin\OrderController::class, 'index']);
+            Route::get('/{order}', [\App\Http\Controllers\Api\Admin\OrderController::class, 'show']);
+            Route::patch('/{order}/status', [\App\Http\Controllers\Api\Admin\OrderController::class, 'status']);
         });
     });
 });

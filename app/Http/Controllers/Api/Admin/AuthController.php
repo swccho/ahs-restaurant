@@ -22,6 +22,11 @@ class AuthController extends Controller
             return ApiResponse::error('User is not assigned to a restaurant.', 403);
         }
 
+        if (isset($user->is_active) && ! $user->is_active) {
+            Auth::logout();
+            return ApiResponse::error('Account is inactive.', 403);
+        }
+
         $user->load('restaurant');
         return ApiResponse::success([
             'user' => [
@@ -40,15 +45,28 @@ class AuthController extends Controller
 
     public function logout(): JsonResponse
     {
-        Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+        $user = Auth::user();
+        if ($user && method_exists($user, 'currentAccessToken') && $user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
+        } else {
+            Auth::logout();
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+        }
         return ApiResponse::success(null, 'Logged out.');
     }
 
     public function me(): JsonResponse
     {
         $user = Auth::user();
+        if (isset($user->is_active) && ! $user->is_active) {
+            if (method_exists($user, 'currentAccessToken')) {
+                $user->currentAccessToken()?->delete();
+            } else {
+                Auth::logout();
+            }
+            return ApiResponse::error('Account is inactive.', 403);
+        }
         $user->load('restaurant');
         return ApiResponse::success([
             'user' => [

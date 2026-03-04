@@ -99,6 +99,7 @@ class DemoRestaurantDataSeeder extends Seeder
     private function seedOffers(Restaurant $restaurant): void
     {
         $now = now();
+        // Active + valid now
         Offer::firstOrCreate(
             [
                 'restaurant_id' => $restaurant->id,
@@ -115,6 +116,24 @@ class DemoRestaurantDataSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+        // Scheduled future
+        Offer::firstOrCreate(
+            [
+                'restaurant_id' => $restaurant->id,
+                'title' => 'Summer Special',
+            ],
+            [
+                'description' => 'Coming soon: 15% off next month',
+                'type' => 'percentage',
+                'value' => 15,
+                'min_order_amount' => 20,
+                'coupon_code' => 'SUMMER15',
+                'starts_at' => $now->copy()->addDays(30),
+                'ends_at' => $now->copy()->addMonths(2),
+                'is_active' => true,
+            ]
+        );
+        // Inactive
         Offer::firstOrCreate(
             [
                 'restaurant_id' => $restaurant->id,
@@ -127,7 +146,7 @@ class DemoRestaurantDataSeeder extends Seeder
                 'min_order_amount' => 25,
                 'starts_at' => $now,
                 'ends_at' => $now->copy()->addWeeks(2),
-                'is_active' => true,
+                'is_active' => false,
             ]
         );
     }

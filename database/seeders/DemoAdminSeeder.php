@@ -31,6 +31,7 @@ class DemoAdminSeeder extends Seeder
                 'password' => Hash::make(self::DEMO_PASSWORD),
                 'restaurant_id' => $restaurant->id,
                 'role' => 'owner',
+                'is_active' => true,
             ]
         );
 

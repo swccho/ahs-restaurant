@@ -21,6 +21,10 @@ class EnsureAdminRestaurantScope
             return ApiResponse::error('User is not assigned to a restaurant.', 403);
         }
 
+        if (isset($user->is_active) && ! $user->is_active) {
+            return ApiResponse::error('Account is inactive.', 403);
+        }
+
         $user->loadMissing('restaurant');
         $restaurant = $user->restaurant;
         if (! $restaurant) {

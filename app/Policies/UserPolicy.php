@@ -38,4 +38,45 @@ class UserPolicy
     {
         return $user->isOwner();
     }
+
+    public function viewAnyStaff(User $user): bool
+    {
+        return $user->isOwner();
+    }
+
+    public function createStaff(User $user): bool
+    {
+        return $user->isOwner();
+    }
+
+    public function updateStaff(User $user, User $model): bool
+    {
+        if (! $user->isOwner()) {
+            return false;
+        }
+        return $model->restaurant_id === $user->restaurant_id;
+    }
+
+    public function toggleStaff(User $user, User $model): bool
+    {
+        if (! $user->isOwner()) {
+            return false;
+        }
+        // Allow so controller can return 422 "You cannot disable your own account"
+        return $model->restaurant_id === $user->restaurant_id;
+    }
+
+    public function deleteStaff(User $user, User $model): bool
+    {
+        if (! $user->isOwner()) {
+            return false;
+        }
+        if ($model->id === $user->id) {
+            return false;
+        }
+        if ($model->isOwner()) {
+            return false;
+        }
+        return $model->restaurant_id === $user->restaurant_id;
+    }
 }
