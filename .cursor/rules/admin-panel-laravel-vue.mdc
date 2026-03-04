@@ -1,0 +1,138 @@
+---
+description: Admin Panel — Laravel + Vue 3 architecture, API, UI/UX, and security rules. Applies when building or editing admin features.
+alwaysApply: true
+---
+
+# Cursor Rules — Admin Panel (Laravel + Vue 3)
+
+## 0) Goal & Scope
+- Build ONLY the **Admin Panel** for the restaurant system.
+- Admin is inside the Laravel project using **Vue 3 + Vite**.
+- Admin must manage: **Orders, Categories, Menu Items, Offers, Restaurant Settings, Staff Users**.
+- Customer Next.js is OUT of scope for now.
+
+---
+
+## 1) Architecture Rules
+- Vue 3 is a SPA mounted inside Laravel (`/admin`).
+- All data comes from Laravel API endpoints under `/api/admin/*`.
+- Use **Sanctum** authentication for admin routes.
+- Every API request must enforce **restaurant_id scoping** (multi-restaurant safe).
+- Never expose data from one restaurant to another (MUST).
+
+---
+
+## 2) Folder & Naming Rules (Vue 3)
+- Use clean module structure:
+  - `src/admin/pages/*` (route pages)
+  - `src/admin/components/*` (reusable UI)
+  - `src/admin/modules/*` (feature modules: orders/menu/offers/settings)
+  - `src/admin/stores/*` (Pinia)
+  - `src/admin/services/*` (API clients)
+  - `src/admin/router/*` (routes + guards)
+  - `src/admin/types/*` (TypeScript types/interfaces)
+
+- Naming:
+  - Pages: `OrdersIndex.vue`, `OrdersShow.vue`, `MenuItemsIndex.vue`
+  - Components: `DataTable.vue`, `FormField.vue`, `StatusBadge.vue`
+  - Stores: `useOrdersStore.ts`, `useMenuStore.ts`
+
+---
+
+## 3) UI/UX Rules
+- Must be responsive (desktop first, usable on mobile).
+- Use consistent layout: Sidebar + Topbar + Main content.
+- Every list page must have: Search, Filters, Pagination, Empty state, Loading state.
+- Every form must have: Inline validation messages, Disabled submit while saving, Toast success/error feedback.
+- Deleting anything requires confirm dialog.
+
+---
+
+## 4) Admin Pages (MUST Build)
+### Core
+- **Dashboard** — overview widgets
+- **Orders** — list with status tabs + search + filters; order details page/drawer; status change actions
+- **Menu** — Categories CRUD + reorder + active toggle; Menu Items CRUD + image upload + availability toggle + featured toggle
+- **Offers** — CRUD + active toggle + scheduling (start/end)
+- **Restaurant Settings** — branding, contact, hours, delivery rules
+- **Staff/Users** (Owner only) — create/disable staff, assign role
+
+---
+
+## 5) Data & Security Rules (Laravel API)
+- Use Form Requests for every create/update endpoint.
+- Use Policies/Gates for every resource: `restaurant_id` match is required.
+- Use Resources/Transformers for responses (no raw models).
+- Use Pagination for list endpoints.
+- Never return hidden/sensitive fields (tokens, passwords).
+
+---
+
+## 6) Orders Workflow Rules
+- Order status enum: `pending -> accepted -> preparing -> out_for_delivery -> delivered`; `cancelled` allowed from `pending/accepted` only (unless owner overrides).
+- Every status change must be recorded in `order_status_logs` table OR `orders.status_updated_at` + audit fields.
+- Order details must show: subtotal, delivery_fee, discount, grand_total.
+- Orders list must show: created time, customer phone, total, current status.
+
+---
+
+## 7) Image Upload Rules (Menu Items + Offers + Branding)
+- Single upload flow: validate file type (jpg/png/webp), limit size (e.g. 2MB), store in `storage/app/public`, return public URL.
+- UI must show preview before save where possible.
+- Always handle missing images gracefully.
+
+---
+
+## 8) API Client Rules (Vue)
+- Centralize API calls in `services/api.ts`.
+- Attach auth cookies/headers properly for Sanctum.
+- Standardize error handling: show toast error with message from API; fallback generic message if missing.
+- Do NOT duplicate API logic inside components.
+
+---
+
+## 9) State Management Rules (Pinia)
+- Use Pinia for: auth user + role, orders list filters/pagination, menu items/categories state.
+- Do NOT store huge datasets in memory; rely on pagination.
+- Always keep URL query params in sync with filters for list pages.
+
+---
+
+## 10) Routing & Guards Rules
+- Admin routes under `/admin/*`.
+- Unauthenticated users redirect to `/admin/login`.
+- Role-based access: Owner-only routes for Settings (certain sections), Staff management.
+- Use a global route guard that checks auth state.
+
+---
+
+## 11) Coding Standards
+- TypeScript everywhere in Vue.
+- No `any` unless absolutely necessary; if used, explain with comment.
+- Components must be small and reusable (avoid 800-line pages).
+- Keep logic in stores/services; components focus on UI.
+
+---
+
+## 12) Quality Checklist (Before Marking Any Admin Feature Complete)
+- [ ] API endpoints exist and are secured by policy
+- [ ] Vue page exists and is accessible via routing
+- [ ] Search, filter, pagination implemented (where list exists)
+- [ ] Validation errors display correctly
+- [ ] Success/error toast feedback works
+- [ ] Empty/loading states exist
+- [ ] Mobile layout tested
+- [ ] No cross-restaurant data access possible
+
+---
+
+## 13) Commit Rules
+- Commit after each meaningful feature with conventional commits, e.g.:
+  - `feat(admin): orders list + filters`
+  - `feat(admin): order details + status updates`
+  - `feat(admin): menu categories CRUD`
+  - `feat(admin): menu items CRUD + upload`
+  - `feat(admin): offers CRUD`
+  - `feat(admin): restaurant settings`
+  - `feat(admin): staff management`
+- No "WIP" commits on main branch.
